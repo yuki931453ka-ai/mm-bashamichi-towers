@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>MM・馬車道タワマン比較</title>
   <meta name="description" content="みなとみらい・馬車道エリアのタワーマンションを地図と表で比較。売買・賃貸の価格帯、設備、立地情報を一覧できます。">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous">
+  <meta property="og:title" content="MM・馬車道タワマン比較">
+  <meta property="og:description" content="みなとみらい・馬車道エリアのタワーマンション比較ツール">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#1e3045" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)">
+  <title>MM・馬車道タワマン比較</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" defer></script>
   <style>
 :root {
@@ -19,9 +25,9 @@
   --accent: oklch(48% 0.14 245);
   --accent-soft: oklch(92% 0.04 245);
   --sale: oklch(52% 0.19 18);
-  --sale-soft: oklch(93% 0.06 18);
+  --sale-on: #fff;
   --rent: oklch(48% 0.13 168);
-  --rent-soft: oklch(92% 0.05 168);
+  --rent-on: #fff;
   --border: oklch(88% 0.012 240);
   --muted: oklch(52% 0.02 240);
   --header-h: 92px;
@@ -37,10 +43,10 @@
     --surface-alt: oklch(16% 0.025 240);
     --accent: oklch(62% 0.14 245);
     --accent-soft: oklch(22% 0.06 245);
-    --sale: oklch(68% 0.18 18);
-    --sale-soft: oklch(22% 0.08 18);
-    --rent: oklch(62% 0.13 168);
-    --rent-soft: oklch(22% 0.06 168);
+    --sale: oklch(58% 0.2 18);
+    --sale-on: oklch(14% 0.03 18);
+    --rent: oklch(55% 0.14 168);
+    --rent-on: oklch(14% 0.03 168);
     --border: oklch(28% 0.02 240);
     --muted: oklch(60% 0.02 240);
     color-scheme: dark;
@@ -53,10 +59,10 @@
   --surface-alt: oklch(16% 0.025 240);
   --accent: oklch(62% 0.14 245);
   --accent-soft: oklch(22% 0.06 245);
-  --sale: oklch(68% 0.18 18);
-  --sale-soft: oklch(22% 0.08 18);
-  --rent: oklch(62% 0.13 168);
-  --rent-soft: oklch(22% 0.06 168);
+  --sale: oklch(58% 0.2 18);
+  --sale-on: oklch(14% 0.03 18);
+  --rent: oklch(55% 0.14 168);
+  --rent-on: oklch(14% 0.03 168);
   --border: oklch(28% 0.02 240);
   --muted: oklch(60% 0.02 240);
   color-scheme: dark;
@@ -102,12 +108,12 @@
   :root:not([data-theme="light"]) .leaflet-tile-pane {
     filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
   }
-  :root:not([data-theme="light"]) .leaflet-control-attribution { background: oklch(0% 0 0/.5); color: #aaa }
+  :root:not([data-theme="light"]) .leaflet-control-attribution { background: oklch(0% 0 0/.5); color: #aaa; }
 }
 :root[data-theme="dark"] .leaflet-tile-pane {
   filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
 }
-:root[data-theme="dark"] .leaflet-control-attribution { background: oklch(0% 0 0/.5); color: #aaa }
+:root[data-theme="dark"] .leaflet-control-attribution { background: oklch(0% 0 0/.5); color: #aaa; }
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -129,17 +135,18 @@ body {
 .header-row {
   display: flex; align-items: center; justify-content: space-between;
   padding: 10px 16px 0;
-  gap: 12px;
+  gap: 8px;
 }
 .header-row h1 {
   font-size: 16px; font-weight: 700; margin: 0;
   white-space: nowrap; letter-spacing: -0.02em;
+  min-width: 0;
 }
+.header-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .mode-toggle {
   display: flex; gap: 2px;
   background: var(--surface-alt);
   border-radius: 8px; padding: 3px;
-  flex-shrink: 0;
 }
 .mode-btn {
   font-family: var(--font-jp);
@@ -149,14 +156,21 @@ body {
   cursor: pointer;
   background: transparent;
   color: var(--muted);
-  transition: all .2s;
+  transition: background .2s, color .2s;
 }
-.mode-btn.active[data-mode="sale"] {
-  background: var(--sale); color: #fff;
+.mode-btn[aria-pressed="true"][data-mode="sale"] {
+  background: var(--sale); color: var(--sale-on);
 }
-.mode-btn.active[data-mode="rent"] {
-  background: var(--rent); color: #fff;
+.mode-btn[aria-pressed="true"][data-mode="rent"] {
+  background: var(--rent); color: var(--rent-on);
 }
+.theme-btn {
+  width: 34px; height: 34px; border: none; border-radius: 8px;
+  background: var(--surface-alt); color: var(--muted);
+  cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+}
+.theme-btn:hover { background: var(--border); }
 .tab-nav {
   display: flex; gap: 0; padding: 0 16px;
   margin-top: 6px;
@@ -168,13 +182,13 @@ body {
   border: none; background: transparent;
   color: var(--muted); cursor: pointer;
   border-bottom: 2px solid transparent;
-  transition: all .2s;
+  transition: color .2s, border-color .2s;
 }
-.tab-btn.active {
+.tab-btn[aria-selected="true"] {
   color: var(--accent);
   border-bottom-color: var(--accent);
 }
-.tab-btn:hover:not(.active) { color: var(--fg) }
+.tab-btn:hover:not([aria-selected="true"]) { color: var(--fg); }
 
 .app-main {
   padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
@@ -182,7 +196,8 @@ body {
   display: flex; flex-direction: column;
 }
 .view-panel { flex: 1; min-height: 0; }
-#map { width: 100%; height: 100%; background: var(--surface-alt); }
+#map-view { position: relative; }
+#map { position: absolute; inset: 0; background: var(--surface-alt); }
 
 .map-legend {
   position: absolute; bottom: 32px; left: 16px; z-index: 1000;
@@ -193,7 +208,7 @@ body {
 }
 .legend-title { font-weight: 700; margin-bottom: 6px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .legend-item { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
-.legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 3px oklch(0% 0 0/.2); flex-shrink: 0; }
+.legend-dot { border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 3px oklch(0% 0 0/.2); flex-shrink: 0; }
 
 .popup-card { padding: 16px 18px; }
 .popup-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; line-height: 1.3; }
@@ -203,9 +218,7 @@ body {
   gap: 2px; margin-bottom: 12px;
   background: var(--border); border-radius: 8px; overflow: hidden;
 }
-.popup-stat {
-  background: var(--surface-alt); padding: 6px 8px; text-align: center;
-}
+.popup-stat { background: var(--surface-alt); padding: 6px 8px; text-align: center; }
 .popup-stat-label { font-size: 10px; color: var(--muted); }
 .popup-stat-value { font-family: var(--font-num); font-size: 14px; font-weight: 600; }
 .popup-price-section { margin-bottom: 10px; }
@@ -239,20 +252,30 @@ body {
   font-size: 13px;
   min-width: 900px;
 }
+.prop-table caption {
+  text-align: left; font-size: 12px; color: var(--muted);
+  padding: 0 0 8px; caption-side: top;
+}
 .prop-table thead { position: sticky; top: 0; z-index: 10; }
 .prop-table th {
   background: var(--surface-alt);
-  padding: 10px 12px;
+  padding: 0;
   text-align: left;
   font-weight: 600; font-size: 12px;
   color: var(--muted);
   border-bottom: 2px solid var(--border);
-  cursor: pointer; user-select: none;
   white-space: nowrap;
+}
+.prop-table th button {
+  all: unset;
+  display: block; width: 100%; padding: 10px 12px;
+  cursor: pointer; user-select: none;
+  font: inherit; color: inherit;
   transition: color .15s;
 }
-.prop-table th:hover { color: var(--fg); }
+.prop-table th button:hover { color: var(--fg); }
 .prop-table th .sort-arrow { font-family: var(--font-num); margin-left: 4px; font-size: 10px; }
+.prop-table th.no-sort { padding: 10px 12px; }
 .prop-table td {
   padding: 12px;
   border-bottom: 1px solid var(--border);
@@ -290,19 +313,23 @@ body {
   background: var(--surface); border-top: 1px solid var(--border);
   padding: 6px 16px;
   padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
-  font-size: 10px; color: var(--muted); text-align: center;
+  font-size: 11px; color: var(--muted); text-align: center;
+}
+
+.noscript-msg {
+  padding: 40px 20px; text-align: center; color: var(--muted);
 }
 
 @media (max-width: 600px) {
-  .header-row h1 { font-size: 14px; }
-  .mode-btn { padding: 5px 12px; font-size: 12px; }
+  .header-row h1 { font-size: 13px; }
+  .mode-btn { padding: 5px 10px; font-size: 12px; }
   .tab-btn { padding: 7px 14px; font-size: 12px; }
   .leaflet-popup-content { min-width: 200px; max-width: 260px; }
-  .map-legend { bottom: 24px; left: 10px; padding: 8px 10px; }
+  .map-legend { bottom: 24px; left: 10px; padding: 8px 10px; font-size: 11px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .custom-marker, .mode-btn, .tab-btn, .prop-table tbody tr { transition: none; }
+  .custom-marker, .mode-btn, .tab-btn, .prop-table tbody tr, .theme-btn { transition: none; }
 }
   </style>
 </head>
@@ -311,25 +338,31 @@ body {
 <header class="app-header">
   <div class="header-row">
     <h1>MM・馬車道 タワマン比較</h1>
-    <div class="mode-toggle">
-      <button class="mode-btn active" data-mode="sale" onclick="setMode('sale')">売買</button>
-      <button class="mode-btn" data-mode="rent" onclick="setMode('rent')">賃貸</button>
+    <div class="header-controls">
+      <div class="mode-toggle" role="group" aria-label="表示モード">
+        <button class="mode-btn" data-mode="sale" aria-pressed="true" id="btn-sale">売買</button>
+        <button class="mode-btn" data-mode="rent" aria-pressed="false" id="btn-rent">賃貸</button>
+      </div>
+      <button class="theme-btn" id="theme-toggle" aria-label="テーマ切替" title="テーマ切替">
+        <span id="theme-icon">☀️</span>
+      </button>
     </div>
   </div>
-  <nav class="tab-nav">
-    <button class="tab-btn active" data-tab="map" onclick="setTab('map')">地図</button>
-    <button class="tab-btn" data-tab="table" onclick="setTab('table')">テーブル</button>
+  <nav class="tab-nav" role="tablist" aria-label="表示切替">
+    <button class="tab-btn" role="tab" data-tab="map" aria-selected="true" aria-controls="map-view" id="tab-map">地図</button>
+    <button class="tab-btn" role="tab" data-tab="table" aria-selected="false" aria-controls="table-view" id="tab-table">テーブル</button>
   </nav>
 </header>
 
 <main class="app-main">
-  <div id="map-view" class="view-panel" style="position:relative">
+  <div id="map-view" class="view-panel" role="tabpanel" aria-labelledby="tab-map">
     <div id="map"></div>
-    <div class="map-legend" id="legend"></div>
+    <div class="map-legend" id="legend" aria-label="凡例"></div>
   </div>
-  <div id="table-view" class="view-panel" hidden>
+  <div id="table-view" class="view-panel" role="tabpanel" aria-labelledby="tab-table" hidden>
     <div class="table-wrap">
       <table class="prop-table" id="prop-table">
+        <caption id="table-caption">みなとみらい・馬車道エリア タワーマンション比較（売買価格帯 下限値でソート）</caption>
         <thead id="table-head"></thead>
         <tbody id="table-body"></tbody>
       </table>
@@ -338,16 +371,29 @@ body {
   <footer class="app-footer">
     価格は2026年11月時点の参考値です（出典: SUUMO, アットホーム, マンションナビ等）。実際の売買・賃貸価格は物件条件により異なります。
   </footer>
+  <noscript>
+    <div class="noscript-msg">
+      <p>このツールにはJavaScriptが必要です。ブラウザのJavaScript設定を有効にしてください。</p>
+    </div>
+  </noscript>
 </main>
 
 <script>
+'use strict';
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
 const PROPERTIES = [
   {
     name: 'ザ・タワー横浜北仲',
     area: '馬車道',
     address: '横浜市中区北仲通5-57-2',
     lat: 35.44945, lng: 139.63720,
-    floors: 58, units: 1176, year: 2019,
+    floors: 58, units: 1176, year: 2020,
     station: '馬車道駅', walkMin: 1,
     sqm: [40, 130],
     sale: [9500, 50000],
@@ -366,10 +412,10 @@ const PROPERTIES = [
     sqm: [42, 95],
     sale: [6645, 22759],
     rent: null,
-    status: 'planned',
     amenities: ['ラウンジ', 'コンシェルジュ'],
     tenure: '定期借地権',
     developer: '東急不動産×京急',
+    status: 'planned',
     note: '2027年竣工予定・定期借地権・新築分譲'
   },
   {
@@ -460,7 +506,19 @@ const PROPERTIES = [
 
 let currentMode = 'sale';
 let currentSort = { key: null, asc: true };
-let map, markers = [];
+let map = null;
+const markers = [];
+
+const SIZE_TIERS = [
+  { min: 1000, radius: 20, label: '大規模 (1,000戸超)' },
+  { min: 500, radius: 16, label: '中大規模 (500〜1,000戸)' },
+  { min: 200, radius: 13, label: '中規模 (200〜500戸)' },
+  { min: 0, radius: 10, label: '小規模 (200戸未満)' }
+];
+
+function markerSize(units) {
+  return (SIZE_TIERS.find(t => units >= t.min) || SIZE_TIERS[SIZE_TIERS.length - 1]).radius;
+}
 
 function formatPrice(man) {
   if (man >= 10000) {
@@ -476,45 +534,49 @@ function formatPriceRange(range, mode) {
   return formatPrice(range[0]) + '〜' + formatPrice(range[1]);
 }
 
-const SIZE_TIERS = [
-  { min: 1000, radius: 22, label: '大規模 (1,000戸超)' },
-  { min: 500, radius: 18, label: '中大規模 (500〜1,000戸)' },
-  { min: 200, radius: 15, label: '中規模 (200〜500戸)' },
-  { min: 0, radius: 12, label: '小規模 (200戸未満)' }
-];
-
-function markerSize(units) {
-  return (SIZE_TIERS.find(function(t) { return units >= t.min; }) || SIZE_TIERS[SIZE_TIERS.length - 1]).radius;
+function markerColor() {
+  return currentMode === 'sale' ? '#c0503a' : '#2a8a6f';
 }
 
 function popupHTML(p) {
-  var priceRange = currentMode === 'sale' ? p.sale : p.rent;
-  var modeClass = currentMode;
-  var modeLabel = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
-  var displayName = p.name.replace(/\n/g, ' ');
+  const priceRange = currentMode === 'sale' ? p.sale : p.rent;
+  const mc = currentMode;
+  const ml = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
+  const dn = escapeHtml(p.name);
   return '<div class="popup-card">' +
-    '<div class="popup-name">' + displayName + '</div>' +
-    '<div class="popup-note">' + p.note + '</div>' +
-    '<div class="popup-meta"><span>' + p.address + '</span></div>' +
-    '<div class="popup-meta"><span>' + p.station + ' 徒歩' + p.walkMin + '分</span></div>' +
+    '<div class="popup-name">' + dn + '</div>' +
+    '<div class="popup-note">' + escapeHtml(p.note) + '</div>' +
+    '<div class="popup-meta"><span>' + escapeHtml(p.address) + '</span></div>' +
+    '<div class="popup-meta"><span>' + escapeHtml(p.station) + ' 徒歩' + p.walkMin + '分</span></div>' +
     '<div class="popup-stats">' +
       '<div class="popup-stat"><div class="popup-stat-label">階数</div><div class="popup-stat-value">' + p.floors + 'F</div></div>' +
       '<div class="popup-stat"><div class="popup-stat-label">総戸数</div><div class="popup-stat-value">' + p.units + '</div></div>' +
       '<div class="popup-stat"><div class="popup-stat-label">竣工' + (p.status === 'planned' ? '予定' : '年') + '</div><div class="popup-stat-value">' + p.year + '</div></div>' +
     '</div>' +
     '<div class="popup-price-section">' +
-      '<div class="popup-price-label ' + modeClass + '">' + modeLabel + '</div>' +
-      '<div class="popup-price ' + modeClass + '">' + formatPriceRange(priceRange, currentMode) + '</div>' +
+      '<div class="popup-price-label ' + mc + '">' + ml + '</div>' +
+      '<div class="popup-price ' + mc + '">' + escapeHtml(formatPriceRange(priceRange, currentMode)) + '</div>' +
       '<div class="popup-price-sub">' + (p.sqm ? p.sqm[0] + '〜' + p.sqm[1] + '㎡' : '') + '</div>' +
     '</div>' +
-    '<div class="popup-tags">' + p.amenities.map(function(a) { return '<span class="popup-tag">' + a + '</span>'; }).join('') + '</div>' +
+    '<div class="popup-tags">' + p.amenities.map(a => '<span class="popup-tag">' + escapeHtml(a) + '</span>').join('') + '</div>' +
   '</div>';
+}
+
+function createMarkerIcon(p, color) {
+  const size = markerSize(p.units);
+  return L.divIcon({
+    className: '',
+    html: '<div class="custom-marker" style="width:' + (size * 2) + 'px;height:' + (size * 2) + 'px;background:' + color + ';font-size:' + (size > 13 ? 11 : 10) + 'px">' + p.floors + '</div>',
+    iconSize: [size * 2, size * 2],
+    iconAnchor: [size, size],
+    popupAnchor: [0, -size]
+  });
 }
 
 function initMap() {
   map = L.map('map', {
-    center: [35.4540, 139.6325],
-    zoom: 15,
+    center: [35.4555, 139.6320],
+    zoom: 16,
     zoomControl: false
   });
   L.control.zoom({ position: 'topright' }).addTo(map);
@@ -522,60 +584,112 @@ function initMap() {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19
   }).addTo(map);
-  renderMarkers();
+  createMarkers();
 }
 
-function renderMarkers() {
-  markers.forEach(function(m) { map.removeLayer(m); });
-  markers = [];
-  var color = currentMode === 'sale' ? '#c0503a' : '#2a8a6f';
-  PROPERTIES.forEach(function(p) {
-    var size = markerSize(p.units);
-    var icon = L.divIcon({
-      className: '',
-      html: '<div class="custom-marker" style="width:' + (size*2) + 'px;height:' + (size*2) + 'px;background:' + color + ';font-size:' + (size > 15 ? 11 : 10) + 'px">' + p.floors + '</div>',
-      iconSize: [size*2, size*2],
-      iconAnchor: [size, size],
-      popupAnchor: [0, -size]
-    });
-    var displayNamePlain = p.name.replace(/\n/g, ' ');
-    var marker = L.marker([p.lat, p.lng], { icon: icon, title: displayNamePlain, alt: displayNamePlain }).addTo(map);
+function createMarkers() {
+  const color = markerColor();
+  PROPERTIES.forEach(p => {
+    const size = markerSize(p.units);
+    const dn = p.name;
+    const marker = L.marker([p.lat, p.lng], {
+      icon: createMarkerIcon(p, color),
+      title: dn,
+      alt: dn
+    }).addTo(map);
     marker.bindPopup(popupHTML(p), { maxWidth: 320, minWidth: 220, autoPanPaddingTopLeft: [10, 100] });
-    var displayName = p.name.replace(/\n/g, ' ');
-    marker.bindTooltip(displayName, { direction: 'top', offset: [0, -size-4] });
+    marker.bindTooltip(dn, { direction: 'top', offset: [0, -size - 4] });
+    marker.on('mouseover', function() { this.setZIndexOffset(1000); });
+    marker.on('mouseout', function() { this.setZIndexOffset(0); });
+    marker._prop = p;
     markers.push(marker);
   });
 }
 
+function updateMarkers() {
+  const color = markerColor();
+  markers.forEach(m => {
+    const p = m._prop;
+    m.setIcon(createMarkerIcon(p, color));
+    m.setPopupContent(popupHTML(p));
+  });
+}
+
 function updateLegend() {
-  var color = currentMode === 'sale' ? '#c0503a' : '#2a8a6f';
-  var modeText = currentMode === 'sale' ? '売買モード' : '賃貸モード';
-  var items = SIZE_TIERS.map(function(t) {
-    return '<div class="legend-item"><span class="legend-dot" style="background:' + color + ';width:' + t.radius + 'px;height:' + t.radius + 'px"></span> ' + t.label + '</div>';
-  }).join('');
-  document.getElementById('legend').innerHTML = '<div class="legend-title">' + modeText + '</div>' + items;
+  const color = markerColor();
+  const modeText = currentMode === 'sale' ? '売買モード' : '賃貸モード';
+  const el = document.getElementById('legend');
+  el.innerHTML = '';
+  const title = document.createElement('div');
+  title.className = 'legend-title';
+  title.textContent = modeText;
+  el.appendChild(title);
+  SIZE_TIERS.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    const dot = document.createElement('span');
+    dot.className = 'legend-dot';
+    dot.style.cssText = 'background:' + color + ';width:' + t.radius + 'px;height:' + t.radius + 'px';
+    item.appendChild(dot);
+    item.appendChild(document.createTextNode(' ' + t.label));
+    el.appendChild(item);
+  });
 }
 
 function setMode(mode) {
   currentMode = mode;
-  document.querySelectorAll('.mode-btn').forEach(function(btn) {
-    btn.classList.toggle('active', btn.dataset.mode === mode);
-  });
-  renderMarkers();
+  document.getElementById('btn-sale').setAttribute('aria-pressed', mode === 'sale');
+  document.getElementById('btn-rent').setAttribute('aria-pressed', mode === 'rent');
+  updateMarkers();
   updateLegend();
   renderTable();
+  document.getElementById('table-caption').textContent =
+    'みなとみらい・馬車道エリア タワーマンション比較（' +
+    (mode === 'sale' ? '売買' : '賃貸') + '価格帯 下限値でソート）';
 }
 
 function setTab(tab) {
-  document.querySelectorAll('.tab-btn').forEach(function(btn) {
-    btn.classList.toggle('active', btn.dataset.tab === tab);
-  });
+  document.getElementById('tab-map').setAttribute('aria-selected', tab === 'map');
+  document.getElementById('tab-table').setAttribute('aria-selected', tab === 'table');
   document.getElementById('map-view').hidden = tab !== 'map';
   document.getElementById('table-view').hidden = tab !== 'table';
-  if (tab === 'map') map.invalidateSize();
+  if (tab === 'map' && map) map.invalidateSize();
 }
 
-var TABLE_COLS = [
+// Theme
+function getStoredTheme() {
+  try { return localStorage.getItem('theme'); } catch { return null; }
+}
+
+function applyTheme(theme) {
+  if (theme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-icon').textContent = '🌙';
+  } else if (theme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.getElementById('theme-icon').textContent = '☀️';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('theme-icon').textContent = window.matchMedia('(prefers-color-scheme: dark)').matches ? '🌙' : '☀️';
+  }
+}
+
+function cycleTheme() {
+  const current = getStoredTheme();
+  let next;
+  if (current === null) next = 'dark';
+  else if (current === 'dark') next = 'light';
+  else next = null;
+  if (next) {
+    try { localStorage.setItem('theme', next); } catch {}
+  } else {
+    try { localStorage.removeItem('theme'); } catch {}
+  }
+  applyTheme(next);
+}
+
+// Table
+const TABLE_COLS = [
   { key: 'name', label: '物件名', sortable: true },
   { key: 'area', label: 'エリア', sortable: true },
   { key: 'price', label: '価格帯', sortable: true },
@@ -590,7 +704,7 @@ var TABLE_COLS = [
 
 function sortValue(p, key) {
   if (key === 'price') {
-    var range = currentMode === 'sale' ? p.sale : p.rent;
+    const range = currentMode === 'sale' ? p.sale : p.rent;
     return range ? range[0] : null;
   }
   if (key === 'name') return p.name;
@@ -599,22 +713,41 @@ function sortValue(p, key) {
 }
 
 function renderTableHead() {
-  var priceLabel = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
-  var cols = TABLE_COLS.map(function(c) {
-    var label = c.key === 'price' ? priceLabel : c.label;
-    var arrow = currentSort.key === c.key ? (currentSort.asc ? ' ↑' : ' ↓') : '';
-    var click = c.sortable ? ' onclick="sortBy(\'' + c.key + '\')"' : '';
-    return '<th' + click + '>' + label + '<span class="sort-arrow">' + arrow + '</span></th>';
-  }).join('');
-  document.getElementById('table-head').innerHTML = '<tr>' + cols + '</tr>';
+  const priceLabel = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
+  const thead = document.getElementById('table-head');
+  thead.innerHTML = '';
+  const tr = document.createElement('tr');
+  TABLE_COLS.forEach(c => {
+    const th = document.createElement('th');
+    const label = c.key === 'price' ? priceLabel : c.label;
+    if (c.sortable) {
+      const arrow = currentSort.key === c.key ? (currentSort.asc ? ' ↑' : ' ↓') : '';
+      const sortDir = currentSort.key === c.key ? (currentSort.asc ? 'ascending' : 'descending') : 'none';
+      th.setAttribute('aria-sort', sortDir);
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = label;
+      const span = document.createElement('span');
+      span.className = 'sort-arrow';
+      span.textContent = arrow;
+      btn.appendChild(span);
+      btn.addEventListener('click', () => sortBy(c.key));
+      th.appendChild(btn);
+    } else {
+      th.className = 'no-sort';
+      th.textContent = label;
+    }
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
 }
 
 function renderTableBody() {
-  var sorted = PROPERTIES.slice();
+  const sorted = [...PROPERTIES];
   if (currentSort.key) {
-    sorted.sort(function(a, b) {
-      var va = sortValue(a, currentSort.key);
-      var vb = sortValue(b, currentSort.key);
+    sorted.sort((a, b) => {
+      const va = sortValue(a, currentSort.key);
+      const vb = sortValue(b, currentSort.key);
       if (va === null && vb === null) return 0;
       if (va === null) return 1;
       if (vb === null) return -1;
@@ -622,24 +755,33 @@ function renderTableBody() {
       return currentSort.asc ? va - vb : vb - va;
     });
   }
-  var modeClass = currentMode;
-  var rows = sorted.map(function(p) {
-    var priceRange = currentMode === 'sale' ? p.sale : p.rent;
-    var displayName = p.name.replace(/\n/g, '<br>');
-    return '<tr>' +
-      '<td><span class="td-name">' + displayName + '</span></td>' +
-      '<td><span class="td-area">' + p.area + '</span></td>' +
-      '<td><span class="td-price ' + modeClass + '">' + formatPriceRange(priceRange, currentMode) + '</span></td>' +
-      '<td class="td-num">' + p.year + '年' + (p.status === 'planned' ? '<br><span style="font-size:10px;color:var(--rent)">竣工予定</span>' : '') + '</td>' +
-      '<td class="td-num">' + p.floors + 'F</td>' +
-      '<td class="td-num">' + p.units.toLocaleString() + '戸</td>' +
-      '<td>' + p.station + '</td>' +
-      '<td class="td-num">' + p.walkMin + '分</td>' +
-      '<td>' + (p.sqm ? p.sqm[0] + '〜' + p.sqm[1] + '㎡' : '—') + '</td>' +
-      '<td><div class="td-tags">' + p.amenities.slice(0, 4).map(function(a) { return '<span class="td-tag">' + a + '</span>'; }).join('') + '</div></td>' +
-    '</tr>';
-  }).join('');
-  document.getElementById('table-body').innerHTML = rows;
+  const mc = currentMode;
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  sorted.forEach(p => {
+    const priceRange = currentMode === 'sale' ? p.sale : p.rent;
+    const tr = document.createElement('tr');
+    const cells = [
+      { html: '<span class="td-name">' + escapeHtml(p.name) + '</span>' },
+      { html: '<span class="td-area">' + escapeHtml(p.area) + '</span>' },
+      { html: '<span class="td-price ' + mc + '">' + escapeHtml(formatPriceRange(priceRange, currentMode)) + '</span>' },
+      { html: p.year + '年' + (p.status === 'planned' ? '<br><span style="font-size:10px;color:var(--rent)">竣工予定</span>' : ''), cls: 'td-num' },
+      { html: p.floors + 'F', cls: 'td-num' },
+      { html: p.units.toLocaleString() + '戸', cls: 'td-num' },
+      { text: p.station },
+      { html: p.walkMin + '分', cls: 'td-num' },
+      { text: p.sqm ? p.sqm[0] + '〜' + p.sqm[1] + '㎡' : '—' },
+      { html: '<div class="td-tags">' + p.amenities.slice(0, 4).map(a => '<span class="td-tag">' + escapeHtml(a) + '</span>').join('') + '</div>' }
+    ];
+    cells.forEach(c => {
+      const td = document.createElement('td');
+      if (c.cls) td.className = c.cls;
+      if (c.text) td.textContent = c.text;
+      else td.innerHTML = c.html;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
 }
 
 function renderTable() {
@@ -651,12 +793,21 @@ function sortBy(key) {
   if (currentSort.key === key) {
     currentSort.asc = !currentSort.asc;
   } else {
-    currentSort = { key: key, asc: true };
+    currentSort = { key, asc: true };
   }
   renderTable();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+// Event binding
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme(getStoredTheme());
+
+  document.getElementById('btn-sale').addEventListener('click', () => setMode('sale'));
+  document.getElementById('btn-rent').addEventListener('click', () => setMode('rent'));
+  document.getElementById('tab-map').addEventListener('click', () => setTab('map'));
+  document.getElementById('tab-table').addEventListener('click', () => setTab('table'));
+  document.getElementById('theme-toggle').addEventListener('click', cycleTheme);
+
   initMap();
   updateLegend();
   renderTable();
