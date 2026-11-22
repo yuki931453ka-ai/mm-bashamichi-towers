@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MM・馬車道タワマン比較</title>
+  <meta name="description" content="みなとみらい・馬車道エリアのタワーマンションを地図と表で比較。売買・賃貸の価格帯、設備、立地情報を一覧できます。">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Outfit:wght@400;500;600;700&display=swap">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <style>
+:root {
+  --bg: oklch(96.5% 0.006 240);
+  --fg: oklch(18% 0.025 240);
+  --surface: oklch(99.5% 0.002 240);
+  --surface-alt: oklch(95% 0.008 240);
+  --accent: oklch(48% 0.14 245);
+  --accent-soft: oklch(92% 0.04 245);
+  --sale: oklch(52% 0.19 18);
+  --sale-soft: oklch(93% 0.06 18);
+  --rent: oklch(48% 0.13 168);
+  --rent-soft: oklch(92% 0.05 168);
+  --border: oklch(88% 0.012 240);
+  --muted: oklch(52% 0.02 240);
+  --header-h: 92px;
+  --font-jp: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+  --font-num: 'Outfit', 'Noto Sans JP', sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: oklch(14% 0.025 240);
+    --fg: oklch(92% 0.01 240);
+    --surface: oklch(19% 0.03 240);
+    --surface-alt: oklch(16% 0.025 240);
+    --accent: oklch(62% 0.14 245);
+    --accent-soft: oklch(22% 0.06 245);
+    --sale: oklch(68% 0.18 18);
+    --sale-soft: oklch(22% 0.08 18);
+    --rent: oklch(62% 0.13 168);
+    --rent-soft: oklch(22% 0.06 168);
+    --border: oklch(28% 0.02 240);
+    --muted: oklch(60% 0.02 240);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: oklch(14% 0.025 240);
+  --fg: oklch(92% 0.01 240);
+  --surface: oklch(19% 0.03 240);
+  --surface-alt: oklch(16% 0.025 240);
+  --accent: oklch(62% 0.14 245);
+  --accent-soft: oklch(22% 0.06 245);
+  --sale: oklch(68% 0.18 18);
+  --sale-soft: oklch(22% 0.08 18);
+  --rent: oklch(62% 0.13 168);
+  --rent-soft: oklch(22% 0.06 168);
+  --border: oklch(28% 0.02 240);
+  --muted: oklch(60% 0.02 240);
+  color-scheme: dark;
+}
+
+/* Leaflet inlined essentials */
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,
+.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,
+.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;outline-offset:1px;font-family:var(--font-jp);font-size:13px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}
+.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+.leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
+.leaflet-tile{filter:inherit;visibility:hidden;user-select:none}
+.leaflet-tile-loaded{visibility:inherit}
+.leaflet-zoom-animated{transform-origin:0 0}
+.leaflet-zoom-anim .leaflet-zoom-animated{will-change:transform;transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-marker-icon,.leaflet-marker-shadow{display:block;pointer-events:none}
+.leaflet-marker-icon{user-select:none}
+.leaflet-marker-icon.leaflet-interactive{pointer-events:auto}
+.leaflet-container img.leaflet-tile{max-width:none!important}
+.leaflet-container .leaflet-overlay-pane svg{max-width:none!important}
+.leaflet-fade-anim .leaflet-popup{transition:opacity .2s linear}
+.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}
+.leaflet-control{position:relative;z-index:800;pointer-events:visiblePainted}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+.leaflet-top .leaflet-control,.leaflet-bottom .leaflet-control{margin-top:10px}
+.leaflet-top .leaflet-control:first-child{margin-top:0}
+.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}
+.leaflet-control-zoom{border:none;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px oklch(0% 0 0/.15)}
+.leaflet-control-zoom a{width:34px;height:34px;line-height:34px;display:block;text-align:center;text-decoration:none;
+  color:var(--fg);font:600 18px/34px var(--font-num);background:var(--surface);border:none}
+.leaflet-control-zoom a:hover{background:var(--surface-alt)}
+.leaflet-control-zoom-in{border-bottom:1px solid var(--border)}
+.leaflet-control-attribution{background:oklch(100% 0 0/.7);padding:2px 6px;font-size:10px;color:#555;border-radius:4px 0 0 0}
+.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
+.leaflet-popup-content-wrapper{padding:0;text-align:left;border-radius:14px;background:var(--surface);
+  box-shadow:0 4px 20px oklch(0% 0 0/.15);border:1px solid var(--border)}
+.leaflet-popup-content{margin:0;line-height:1.5;font-size:13px;min-width:240px;max-width:300px}
+.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;transform:translateX(-50%);overflow:hidden;pointer-events:none}
+.leaflet-popup-tip{width:17px;height:17px;margin:-10px auto 0;transform:rotate(45deg);background:var(--surface);
+  box-shadow:0 4px 20px oklch(0% 0 0/.15);border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.leaflet-popup-close-button{position:absolute;top:8px;right:10px;width:22px;height:22px;font:14px/22px sans-serif;
+  color:var(--muted);text-decoration:none;text-align:center;background:transparent;border:none;cursor:pointer;z-index:10;
+  border-radius:50%;transition:background .15s}
+.leaflet-popup-close-button:hover{background:var(--surface-alt);color:var(--fg)}
+.leaflet-interactive{cursor:pointer}.leaflet-grab{cursor:grab}
+.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive{cursor:grabbing}
+.leaflet-container a{color:var(--accent)}
+.leaflet-tooltip{position:absolute;padding:4px 10px;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;color:var(--fg);white-space:nowrap;user-select:none;pointer-events:none;
+  box-shadow:0 2px 8px oklch(0% 0 0/.1);font-size:12px;font-weight:500}
+.leaflet-tooltip-top:before{position:absolute;content:'';bottom:-6px;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--border)}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .leaflet-tile-pane {
+    filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+  }
+  :root:not([data-theme="light"]) .leaflet-control-attribution { background: oklch(0% 0 0/.5); color: #aaa }
+}
+:root[data-theme="dark"] .leaflet-tile-pane {
+  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+:root[data-theme="dark"] .leaflet-control-attribution { background: oklch(0% 0 0/.5); color: #aaa }
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-jp);
+  padding: 0;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+.app-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding-top: env(safe-area-inset-top, 0px);
+  box-shadow: 0 1px 4px oklch(0% 0 0/.06);
+}
+.header-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 0;
+  gap: 12px;
+}
+.header-row h1 {
+  font-size: 16px; font-weight: 700; margin: 0;
+  white-space: nowrap; letter-spacing: -0.02em;
+}
+.mode-toggle {
+  display: flex; gap: 2px;
+  background: var(--surface-alt);
+  border-radius: 8px; padding: 3px;
+  flex-shrink: 0;
+}
+.mode-btn {
+  font-family: var(--font-jp);
+  font-size: 13px; font-weight: 500;
+  padding: 5px 16px;
+  border: none; border-radius: 6px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--muted);
+  transition: all .2s;
+}
+.mode-btn.active[data-mode="sale"] {
+  background: var(--sale); color: #fff;
+}
+.mode-btn.active[data-mode="rent"] {
+  background: var(--rent); color: #fff;
+}
+.tab-nav {
+  display: flex; gap: 0; padding: 0 16px;
+  margin-top: 6px;
+}
+.tab-btn {
+  font-family: var(--font-jp);
+  font-size: 13px; font-weight: 500;
+  padding: 8px 20px;
+  border: none; background: transparent;
+  color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+}
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.tab-btn:hover:not(.active) { color: var(--fg) }
+
+.app-main {
+  padding-top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+  height: 100%;
+  display: flex; flex-direction: column;
+}
+.view-panel { flex: 1; min-height: 0; }
+#map { width: 100%; height: 100%; background: var(--surface-alt); }
+
+.map-legend {
+  position: absolute; bottom: 32px; left: 16px; z-index: 1000;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 14px;
+  box-shadow: 0 2px 10px oklch(0% 0 0/.1);
+  font-size: 12px; pointer-events: auto;
+}
+.legend-title { font-weight: 700; margin-bottom: 6px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.legend-item { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 3px oklch(0% 0 0/.2); flex-shrink: 0; }
+
+.popup-card { padding: 16px 18px; }
+.popup-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; line-height: 1.3; }
+.popup-note { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.popup-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 2px; margin-bottom: 12px;
+  background: var(--border); border-radius: 8px; overflow: hidden;
+}
+.popup-stat {
+  background: var(--surface-alt); padding: 6px 8px; text-align: center;
+}
+.popup-stat-label { font-size: 10px; color: var(--muted); }
+.popup-stat-value { font-family: var(--font-num); font-size: 14px; font-weight: 600; }
+.popup-price-section { margin-bottom: 10px; }
+.popup-price-label { font-size: 11px; font-weight: 500; margin-bottom: 3px; }
+.popup-price-label.sale { color: var(--sale); }
+.popup-price-label.rent { color: var(--rent); }
+.popup-price {
+  font-family: var(--font-num); font-size: 18px; font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.popup-price.sale { color: var(--sale); }
+.popup-price.rent { color: var(--rent); }
+.popup-price-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.popup-meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; display: flex; gap: 12px; }
+.popup-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.popup-tag {
+  font-size: 10px; padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--accent-soft); color: var(--accent);
+  font-weight: 500;
+}
+
+.table-wrap {
+  height: 100%; overflow: auto;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+.prop-table {
+  width: 100%; border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  min-width: 900px;
+}
+.prop-table thead { position: sticky; top: 0; z-index: 10; }
+.prop-table th {
+  background: var(--surface-alt);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600; font-size: 12px;
+  color: var(--muted);
+  border-bottom: 2px solid var(--border);
+  cursor: pointer; user-select: none;
+  white-space: nowrap;
+  transition: color .15s;
+}
+.prop-table th:hover { color: var(--fg); }
+.prop-table th .sort-arrow { font-family: var(--font-num); margin-left: 4px; font-size: 10px; }
+.prop-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.prop-table tbody tr { transition: background .15s; }
+.prop-table tbody tr:hover { background: var(--accent-soft); }
+.td-name { font-weight: 700; font-size: 14px; white-space: nowrap; }
+.td-area {
+  display: inline-block; font-size: 11px; font-weight: 500;
+  padding: 2px 8px; border-radius: 4px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.td-price { font-family: var(--font-num); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.td-price.sale { color: var(--sale); }
+.td-price.rent { color: var(--rent); }
+.td-num { font-family: var(--font-num); font-variant-numeric: tabular-nums; text-align: right; }
+.td-tags { display: flex; flex-wrap: wrap; gap: 3px; max-width: 220px; }
+.td-tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: var(--surface-alt); color: var(--muted); white-space: nowrap; }
+
+.custom-marker {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 2.5px solid #fff;
+  box-shadow: 0 2px 8px oklch(0% 0 0/.25);
+  font-family: var(--font-num);
+  font-weight: 700; font-size: 11px; color: #fff;
+  transition: transform .15s;
+  cursor: pointer;
+}
+.custom-marker:hover { transform: scale(1.2); }
+
+.app-footer {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 1050;
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 4px 16px;
+  padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px));
+  font-size: 10px; color: var(--muted); text-align: center;
+}
+
+@media (max-width: 600px) {
+  .header-row h1 { font-size: 14px; }
+  .mode-btn { padding: 5px 12px; font-size: 12px; }
+  .tab-btn { padding: 7px 14px; font-size: 12px; }
+  .leaflet-popup-content { min-width: 200px; max-width: 260px; }
+  .map-legend { bottom: 24px; left: 10px; padding: 8px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-marker, .mode-btn, .tab-btn, .prop-table tbody tr { transition: none; }
+}
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-row">
+    <h1>MM・馬車道 タワマン比較</h1>
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="sale" onclick="setMode('sale')">売買</button>
+      <button class="mode-btn" data-mode="rent" onclick="setMode('rent')">賃貸</button>
+    </div>
+  </div>
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="map" onclick="setTab('map')">地図</button>
+    <button class="tab-btn" data-tab="table" onclick="setTab('table')">テーブル</button>
+  </nav>
+</header>
+
+<main class="app-main">
+  <div id="map-view" class="view-panel" style="position:relative">
+    <div id="map"></div>
+    <div class="map-legend" id="legend"></div>
+  </div>
+  <div id="table-view" class="view-panel" hidden>
+    <div class="table-wrap">
+      <table class="prop-table" id="prop-table">
+        <thead id="table-head"></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <footer class="app-footer">
+    価格は2026年11月時点の参考値です（出典: SUUMO, アットホーム, マンションナビ等）。実際の売買・賃貸価格は物件条件により異なります。
+  </footer>
+</main>
+
+<script>
+const PROPERTIES = [
+  {
+    name: 'ザ・タワー横浜北仲',
+    area: '馬車道',
+    address: '横浜市中区北仲通5-57-2',
+    lat: 35.44945, lng: 139.63720,
+    floors: 58, units: 1176, year: 2019,
+    station: '馬車道駅', walkMin: 1,
+    sqm: [40, 130],
+    sale: [9500, 50000],
+    rent: [25, 80],
+    amenities: ['コンシェルジュ', '床暖房', 'ディスポーザー', 'スカイラウンジ', 'オートロック', '宅配ロッカー'],
+    status: 'existing',
+    note: '横浜最高層の住宅（58階）・北仲通地区再開発'
+  },
+  {
+    name: 'ブランズタワー横浜北仲',
+    area: '馬車道',
+    address: '横浜市中区海岸通5-25-1',
+    lat: 35.44875, lng: 139.63835,
+    floors: 40, units: 704, year: 2027,
+    station: '馬車道駅', walkMin: 2,
+    sqm: [42, 95],
+    sale: [6645, 22759],
+    rent: null,
+    status: 'planned',
+    amenities: ['定期借地権', '東急不動産×京急'],
+    note: '2027年竣工予定・新築分譲'
+  },
+  {
+    name: "D'グラフォート横浜",
+    area: '馬車道',
+    address: '横浜市中区本町4-41',
+    lat: 35.45060, lng: 139.63665,
+    floors: 21, units: 135, year: 2004,
+    station: '馬車道駅', walkMin: 1,
+    sqm: [45, 120],
+    sale: [5000, 10000],
+    rent: [15, 30],
+    amenities: ['免震構造', 'コンシェルジュ', 'スカイラウンジ', '指紋認証', '24時間有人管理'],
+    status: 'existing',
+    note: '指紋照合セキュリティ採用'
+  },
+  {
+    name: 'MM ミッドスクエア ザ・タワーレジデンス',
+    area: 'みなとみらい',
+    address: '横浜市西区みなとみらい4-7-1',
+    lat: 35.45715, lng: 139.63185,
+    floors: 31, units: 650, year: 2007,
+    station: 'みなとみらい駅', walkMin: 1,
+    sqm: [55, 160],
+    sale: [8500, 48800],
+    rent: [20, 55],
+    amenities: ['コンシェルジュ', '24時間セキュリティ', 'オートロック', '宅配ボックス', '24時間有人管理'],
+    status: 'existing',
+    note: 'みなとみらい駅直結'
+  },
+  {
+    name: 'M.M.TOWERS The South',
+    area: 'みなとみらい',
+    address: '横浜市西区みなとみらい4-9',
+    lat: 35.45780, lng: 139.63100,
+    floors: 30, units: 287, year: 2003,
+    station: 'みなとみらい駅', walkMin: 3,
+    sqm: [55, 130],
+    sale: [7000, 13000],
+    rent: [18, 40],
+    amenities: ['免震構造', '24時間有人管理', '全熱交換式24時間換気', 'コアウォール構造'],
+    status: 'existing',
+    note: 'MM初期タワマン3棟のひとつ'
+  },
+  {
+    name: 'M.M.TOWERS FORESIS',
+    area: 'みなとみらい',
+    address: '横浜市西区みなとみらい4-10',
+    lat: 35.45730, lng: 139.63030,
+    floors: 30, units: 1226, year: 2007,
+    station: 'みなとみらい駅', walkMin: 1,
+    sqm: [60, 140],
+    sale: [8500, 15500],
+    rent: [20, 45],
+    amenities: ['免震構造', 'スカイラウンジ', 'ゲストルーム', 'コンシェルジュ', '24時間有人管理', 'フロントサービス'],
+    status: 'existing',
+    note: '全1,226戸の大規模レジデンス'
+  },
+  {
+    name: 'ブリリアグランデみなとみらい',
+    area: 'みなとみらい',
+    address: '横浜市西区みなとみらい5-3-2',
+    lat: 35.45980, lng: 139.62810,
+    floors: 30, units: 555, year: 2008,
+    station: '新高島駅', walkMin: 7,
+    sqm: [55, 110],
+    sale: [6000, 24000],
+    rent: [18, 45],
+    amenities: ['制震構造', 'コンシェルジュ', 'ゲストルーム', '床暖房', 'ディスポーザー', 'パーティーラウンジ'],
+    status: 'existing',
+    note: '臨港パーク至近'
+  },
+  {
+    name: 'ブランズタワーみなとみらい',
+    area: 'みなとみらい',
+    address: '横浜市西区みなとみらい3-7-2',
+    lat: 35.45530, lng: 139.63340,
+    floors: 29, units: 228, year: 2017,
+    station: 'みなとみらい駅', walkMin: 2,
+    sqm: [55, 130],
+    sale: [8000, 34000],
+    rent: [22, 55],
+    amenities: ['免震構造', 'コンシェルジュ', '24時間有人管理', 'オートロック'],
+    status: 'existing',
+    note: 'クイーンズスクエア隣接'
+  }
+];
+
+let currentMode = 'sale';
+let currentSort = { key: null, asc: true };
+let map, markers = [];
+
+function formatPrice(man) {
+  if (man >= 10000) {
+    const oku = man / 10000;
+    return (oku % 1 === 0 ? oku.toFixed(0) : oku.toFixed(1)) + '億';
+  }
+  return man.toLocaleString() + '万';
+}
+
+function formatPriceRange(range, mode) {
+  if (!range) return '未定';
+  if (mode === 'rent') return range[0] + '万〜' + range[1] + '万/月';
+  return formatPrice(range[0]) + '〜' + formatPrice(range[1]);
+}
+
+const SIZE_TIERS = [
+  { min: 1000, radius: 22, label: '大規模 (1,000戸超)' },
+  { min: 500, radius: 18, label: '中大規模 (500〜1,000戸)' },
+  { min: 200, radius: 15, label: '中規模 (200〜500戸)' },
+  { min: 0, radius: 12, label: '小規模 (200戸未満)' }
+];
+
+function markerSize(units) {
+  return (SIZE_TIERS.find(function(t) { return units >= t.min; }) || SIZE_TIERS[SIZE_TIERS.length - 1]).radius;
+}
+
+function popupHTML(p) {
+  var priceRange = currentMode === 'sale' ? p.sale : p.rent;
+  var modeClass = currentMode;
+  var modeLabel = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
+  var displayName = p.name.replace(/\n/g, ' ');
+  return '<div class="popup-card">' +
+    '<div class="popup-name">' + displayName + '</div>' +
+    '<div class="popup-note">' + p.note + '</div>' +
+    '<div class="popup-meta"><span>' + p.address + '</span></div>' +
+    '<div class="popup-meta"><span>' + p.station + ' 徒歩' + p.walkMin + '分</span></div>' +
+    '<div class="popup-stats">' +
+      '<div class="popup-stat"><div class="popup-stat-label">階数</div><div class="popup-stat-value">' + p.floors + 'F</div></div>' +
+      '<div class="popup-stat"><div class="popup-stat-label">総戸数</div><div class="popup-stat-value">' + p.units + '</div></div>' +
+      '<div class="popup-stat"><div class="popup-stat-label">竣工' + (p.status === 'planned' ? '予定' : '年') + '</div><div class="popup-stat-value">' + p.year + '</div></div>' +
+    '</div>' +
+    '<div class="popup-price-section">' +
+      '<div class="popup-price-label ' + modeClass + '">' + modeLabel + '</div>' +
+      '<div class="popup-price ' + modeClass + '">' + formatPriceRange(priceRange, currentMode) + '</div>' +
+      '<div class="popup-price-sub">' + (p.sqm ? p.sqm[0] + '〜' + p.sqm[1] + '㎡' : '') + '</div>' +
+    '</div>' +
+    '<div class="popup-tags">' + p.amenities.map(function(a) { return '<span class="popup-tag">' + a + '</span>'; }).join('') + '</div>' +
+  '</div>';
+}
+
+function initMap() {
+  map = L.map('map', {
+    center: [35.4540, 139.6325],
+    zoom: 15,
+    zoomControl: false
+  });
+  L.control.zoom({ position: 'topright' }).addTo(map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19
+  }).addTo(map);
+  renderMarkers();
+}
+
+function renderMarkers() {
+  markers.forEach(function(m) { map.removeLayer(m); });
+  markers = [];
+  var color = currentMode === 'sale' ? '#c0503a' : '#2a8a6f';
+  PROPERTIES.forEach(function(p) {
+    var size = markerSize(p.units);
+    var icon = L.divIcon({
+      className: '',
+      html: '<div class="custom-marker" style="width:' + (size*2) + 'px;height:' + (size*2) + 'px;background:' + color + ';font-size:' + (size > 15 ? 11 : 10) + 'px">' + p.floors + '</div>',
+      iconSize: [size*2, size*2],
+      iconAnchor: [size, size],
+      popupAnchor: [0, -size]
+    });
+    var marker = L.marker([p.lat, p.lng], { icon: icon }).addTo(map);
+    marker.bindPopup(popupHTML(p), { maxWidth: 320, minWidth: 220, autoPanPaddingTopLeft: [10, 100] });
+    var displayName = p.name.replace(/\n/g, ' ');
+    marker.bindTooltip(displayName, { direction: 'top', offset: [0, -size-4] });
+    marker._propData = p;
+    markers.push(marker);
+  });
+}
+
+function updateLegend() {
+  var color = currentMode === 'sale' ? '#c0503a' : '#2a8a6f';
+  var modeText = currentMode === 'sale' ? '売買モード' : '賃貸モード';
+  var items = SIZE_TIERS.map(function(t) {
+    return '<div class="legend-item"><span class="legend-dot" style="background:' + color + ';width:' + t.radius + 'px;height:' + t.radius + 'px"></span> ' + t.label + '</div>';
+  }).join('');
+  document.getElementById('legend').innerHTML = '<div class="legend-title">' + modeText + '</div>' + items;
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  renderMarkers();
+  updateLegend();
+  renderTable();
+}
+
+function setTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  document.getElementById('map-view').hidden = tab !== 'map';
+  document.getElementById('table-view').hidden = tab !== 'table';
+  if (tab === 'map') map.invalidateSize();
+}
+
+var TABLE_COLS = [
+  { key: 'name', label: '物件名', sortable: true },
+  { key: 'area', label: 'エリア', sortable: true },
+  { key: 'price', label: '価格帯', sortable: true },
+  { key: 'year', label: '竣工年', sortable: true },
+  { key: 'floors', label: '階数', sortable: true },
+  { key: 'units', label: '総戸数', sortable: true },
+  { key: 'station', label: '最寄駅', sortable: false },
+  { key: 'walkMin', label: '徒歩', sortable: true },
+  { key: 'sqm', label: '面積', sortable: false },
+  { key: 'amenities', label: '主な設備', sortable: false }
+];
+
+function sortValue(p, key) {
+  if (key === 'price') {
+    var range = currentMode === 'sale' ? p.sale : p.rent;
+    return range ? range[0] : null;
+  }
+  if (key === 'name') return p.name;
+  if (key === 'area') return p.area;
+  return p[key] != null ? p[key] : 0;
+}
+
+function renderTableHead() {
+  var priceLabel = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
+  var cols = TABLE_COLS.map(function(c) {
+    var label = c.key === 'price' ? priceLabel : c.label;
+    var arrow = currentSort.key === c.key ? (currentSort.asc ? ' ↑' : ' ↓') : '';
+    var click = c.sortable ? ' onclick="sortBy(\'' + c.key + '\')"' : '';
+    return '<th' + click + '>' + label + '<span class="sort-arrow">' + arrow + '</span></th>';
+  }).join('');
+  document.getElementById('table-head').innerHTML = '<tr>' + cols + '</tr>';
+}
+
+function renderTableBody() {
+  var sorted = PROPERTIES.slice();
+  if (currentSort.key) {
+    sorted.sort(function(a, b) {
+      var va = sortValue(a, currentSort.key);
+      var vb = sortValue(b, currentSort.key);
+      if (va === null && vb === null) return 0;
+      if (va === null) return 1;
+      if (vb === null) return -1;
+      if (typeof va === 'string') return currentSort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+      return currentSort.asc ? va - vb : vb - va;
+    });
+  }
+  var modeClass = currentMode;
+  var rows = sorted.map(function(p) {
+    var priceRange = currentMode === 'sale' ? p.sale : p.rent;
+    var displayName = p.name.replace(/\n/g, '<br>');
+    return '<tr>' +
+      '<td><span class="td-name">' + displayName + '</span></td>' +
+      '<td><span class="td-area">' + p.area + '</span></td>' +
+      '<td><span class="td-price ' + modeClass + '">' + formatPriceRange(priceRange, currentMode) + '</span></td>' +
+      '<td class="td-num">' + p.year + '年' + (p.status === 'planned' ? '<br><span style="font-size:10px;color:var(--rent)">竣工予定</span>' : '') + '</td>' +
+      '<td class="td-num">' + p.floors + 'F</td>' +
+      '<td class="td-num">' + p.units.toLocaleString() + '戸</td>' +
+      '<td>' + p.station + '</td>' +
+      '<td class="td-num">' + p.walkMin + '分</td>' +
+      '<td>' + (p.sqm ? p.sqm[0] + '〜' + p.sqm[1] + '㎡' : '—') + '</td>' +
+      '<td><div class="td-tags">' + p.amenities.slice(0, 4).map(function(a) { return '<span class="td-tag">' + a + '</span>'; }).join('') + '</div></td>' +
+    '</tr>';
+  }).join('');
+  document.getElementById('table-body').innerHTML = rows;
+}
+
+function renderTable() {
+  renderTableHead();
+  renderTableBody();
+}
+
+function sortBy(key) {
+  if (currentSort.key === key) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort = { key: key, asc: true };
+  }
+  renderTable();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initMap();
+  updateLegend();
+  renderTable();
+});
+</script>
+
+</body>
+</html>
