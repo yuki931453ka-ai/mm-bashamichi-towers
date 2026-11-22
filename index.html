@@ -232,6 +232,23 @@ body {
 .popup-price.sale { color: var(--sale); }
 .popup-price.rent { color: var(--rent); }
 .popup-price-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.popup-listings {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px; margin-top: 4px;
+}
+.popup-listings.has { background: oklch(85% 0.08 145); color: oklch(30% 0.1 145); }
+.popup-listings.none { background: var(--surface-alt); color: var(--muted); }
+.popup-listings.new-sale { background: oklch(85% 0.1 60); color: oklch(35% 0.12 60); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .popup-listings.has,
+  :root:not([data-theme="light"]) .td-listings .badge.has { background: oklch(28% 0.06 145); color: oklch(72% 0.1 145); }
+  :root:not([data-theme="light"]) .popup-listings.new-sale,
+  :root:not([data-theme="light"]) .td-listings .badge.new-sale { background: oklch(28% 0.08 60); color: oklch(72% 0.12 60); }
+}
+:root[data-theme="dark"] .popup-listings.has,
+:root[data-theme="dark"] .td-listings .badge.has { background: oklch(28% 0.06 145); color: oklch(72% 0.1 145); }
+:root[data-theme="dark"] .popup-listings.new-sale,
+:root[data-theme="dark"] .td-listings .badge.new-sale { background: oklch(28% 0.08 60); color: oklch(72% 0.12 60); }
 .popup-meta { font-size: 12px; color: var(--muted); margin-bottom: 10px; display: flex; gap: 12px; }
 .popup-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .popup-tag {
@@ -250,7 +267,7 @@ body {
   width: 100%; border-collapse: separate;
   border-spacing: 0;
   font-size: 13px;
-  min-width: 900px;
+  min-width: 1000px;
 }
 .prop-table caption {
   text-align: left; font-size: 12px; color: var(--muted);
@@ -295,6 +312,13 @@ body {
 .td-num { font-family: var(--font-num); font-variant-numeric: tabular-nums; text-align: right; }
 .td-tags { display: flex; flex-wrap: wrap; gap: 3px; max-width: 220px; }
 .td-tag { font-size: 10px; padding: 1px 6px; border-radius: 3px; background: var(--surface-alt); color: var(--muted); white-space: nowrap; }
+.td-listings { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.td-listings .badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+}
+.td-listings .badge.has { background: oklch(85% 0.08 145); color: oklch(30% 0.1 145); }
+.td-listings .badge.none { background: var(--surface-alt); color: var(--muted); }
+.td-listings .badge.new-sale { background: oklch(85% 0.1 60); color: oklch(35% 0.12 60); }
 
 .custom-marker {
   display: flex; align-items: center; justify-content: center;
@@ -369,7 +393,7 @@ body {
     </div>
   </div>
   <footer class="app-footer">
-    価格は2026年11月時点の参考値です（出典: SUUMO, アットホーム, マンションナビ等）。実際の売買・賃貸価格は物件条件により異なります。
+    価格・募集件数は2026年11月時点の参考値です（出典: SUUMO, アットホーム, マンションナビ, 三井のリハウス等）。実際の売買・賃貸価格や空き状況は物件条件により異なります。
   </footer>
   <noscript>
     <div class="noscript-msg">
@@ -396,8 +420,8 @@ const PROPERTIES = [
     floors: 58, units: 1176, year: 2020,
     station: '馬車道駅', walkMin: 1,
     sqm: [40, 130],
-    sale: [9500, 50000],
-    rent: [25, 80],
+    sale: [9500, 50000], saleListings: 5,
+    rent: [25, 80], rentListings: 4,
     amenities: ['コンシェルジュ', '床暖房', 'ディスポーザー', 'スカイラウンジ', 'オートロック', '宅配ロッカー'],
     status: 'existing',
     note: '横浜最高層の住宅（58階）・北仲通地区再開発'
@@ -409,14 +433,14 @@ const PROPERTIES = [
     lat: 35.44875, lng: 139.63835,
     floors: 40, units: 704, year: 2027,
     station: '馬車道駅', walkMin: 2,
-    sqm: [42, 95],
-    sale: [6645, 22759],
-    rent: null,
+    sqm: [40, 95],
+    sale: [6645, 22759], saleListings: 0, saleNote: '新築分譲（第3期2次）',
+    rent: null, rentListings: 0,
     amenities: ['ラウンジ', 'コンシェルジュ'],
     tenure: '定期借地権',
     developer: '東急不動産×京急',
     status: 'planned',
-    note: '2027年竣工予定・定期借地権・新築分譲'
+    note: '2027年竣工予定・定期借地権・新築分譲（引渡2028年6月）'
   },
   {
     name: "D'グラフォート横浜",
@@ -426,8 +450,8 @@ const PROPERTIES = [
     floors: 21, units: 135, year: 2004,
     station: '馬車道駅', walkMin: 1,
     sqm: [45, 120],
-    sale: [5000, 10000],
-    rent: [15, 30],
+    sale: [5000, 10000], saleListings: 2,
+    rent: [15, 30], rentListings: 1,
     amenities: ['免震構造', 'コンシェルジュ', 'スカイラウンジ', '指紋認証', '24時間有人管理'],
     status: 'existing',
     note: '指紋照合セキュリティ採用'
@@ -440,8 +464,8 @@ const PROPERTIES = [
     floors: 31, units: 650, year: 2007,
     station: 'みなとみらい駅', walkMin: 1,
     sqm: [55, 160],
-    sale: [8500, 48800],
-    rent: [20, 55],
+    sale: [8500, 48800], saleListings: 3,
+    rent: [20, 55], rentListings: 2,
     amenities: ['コンシェルジュ', '24時間セキュリティ', 'オートロック', '宅配ボックス', '24時間有人管理'],
     status: 'existing',
     note: 'みなとみらい駅直結'
@@ -454,8 +478,8 @@ const PROPERTIES = [
     floors: 30, units: 287, year: 2003,
     station: 'みなとみらい駅', walkMin: 3,
     sqm: [55, 130],
-    sale: [7000, 13000],
-    rent: [18, 40],
+    sale: [7000, 13000], saleListings: 5,
+    rent: [18, 40], rentListings: 1,
     amenities: ['免震構造', '24時間有人管理', '全熱交換式24時間換気', 'コアウォール構造'],
     status: 'existing',
     note: 'MM初期タワマン3棟のひとつ'
@@ -468,8 +492,8 @@ const PROPERTIES = [
     floors: 30, units: 1226, year: 2007,
     station: 'みなとみらい駅', walkMin: 1,
     sqm: [60, 140],
-    sale: [8500, 15500],
-    rent: [20, 45],
+    sale: [8500, 15500], saleListings: 3,
+    rent: [20, 45], rentListings: 2,
     amenities: ['免震構造', 'スカイラウンジ', 'ゲストルーム', 'コンシェルジュ', '24時間有人管理', 'フロントサービス'],
     status: 'existing',
     note: '全1,226戸の大規模レジデンス'
@@ -482,8 +506,8 @@ const PROPERTIES = [
     floors: 30, units: 555, year: 2008,
     station: '新高島駅', walkMin: 7,
     sqm: [55, 110],
-    sale: [6000, 24000],
-    rent: [18, 45],
+    sale: [6000, 24000], saleListings: 1,
+    rent: [18, 45], rentListings: 0,
     amenities: ['制震構造', 'コンシェルジュ', 'ゲストルーム', '床暖房', 'ディスポーザー', 'パーティーラウンジ'],
     status: 'existing',
     note: '臨港パーク至近'
@@ -496,8 +520,8 @@ const PROPERTIES = [
     floors: 29, units: 228, year: 2017,
     station: 'みなとみらい駅', walkMin: 2,
     sqm: [55, 130],
-    sale: [8000, 34000],
-    rent: [22, 55],
+    sale: [8000, 34000], saleListings: 1,
+    rent: [22, 55], rentListings: 1,
     amenities: ['免震構造', 'コンシェルジュ', '24時間有人管理', 'オートロック'],
     status: 'existing',
     note: 'クイーンズスクエア隣接'
@@ -538,10 +562,18 @@ function markerColor() {
   return currentMode === 'sale' ? '#c0503a' : '#2a8a6f';
 }
 
+function listingsBadge(count, saleNote) {
+  if (saleNote) return '<span class="popup-listings new-sale">' + escapeHtml(saleNote) + '</span>';
+  if (count > 0) return '<span class="popup-listings has">' + count + '件募集中</span>';
+  return '<span class="popup-listings none">現在募集なし</span>';
+}
+
 function popupHTML(p) {
   const priceRange = currentMode === 'sale' ? p.sale : p.rent;
   const mc = currentMode;
   const ml = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
+  const listingsCount = currentMode === 'sale' ? (p.saleListings || 0) : (p.rentListings || 0);
+  const saleNote = currentMode === 'sale' ? (p.saleNote || null) : null;
   const dn = escapeHtml(p.name);
   return '<div class="popup-card">' +
     '<div class="popup-name">' + dn + '</div>' +
@@ -557,6 +589,7 @@ function popupHTML(p) {
       '<div class="popup-price-label ' + mc + '">' + ml + '</div>' +
       '<div class="popup-price ' + mc + '">' + escapeHtml(formatPriceRange(priceRange, currentMode)) + '</div>' +
       '<div class="popup-price-sub">' + (p.sqm ? p.sqm[0] + '〜' + p.sqm[1] + '㎡' : '') + '</div>' +
+      '<div style="margin-top:6px">' + listingsBadge(listingsCount, saleNote) + '</div>' +
     '</div>' +
     '<div class="popup-tags">' + p.amenities.map(a => '<span class="popup-tag">' + escapeHtml(a) + '</span>').join('') + '</div>' +
   '</div>';
@@ -693,6 +726,7 @@ const TABLE_COLS = [
   { key: 'name', label: '物件名', sortable: true },
   { key: 'area', label: 'エリア', sortable: true },
   { key: 'price', label: '価格帯', sortable: true },
+  { key: 'listings', label: '募集数', sortable: true },
   { key: 'year', label: '竣工年', sortable: true },
   { key: 'floors', label: '階数', sortable: true },
   { key: 'units', label: '総戸数', sortable: true },
@@ -707,6 +741,9 @@ function sortValue(p, key) {
     const range = currentMode === 'sale' ? p.sale : p.rent;
     return range ? range[0] : null;
   }
+  if (key === 'listings') {
+    return currentMode === 'sale' ? (p.saleListings || 0) : (p.rentListings || 0);
+  }
   if (key === 'name') return p.name;
   if (key === 'area') return p.area;
   return p[key] != null ? p[key] : 0;
@@ -714,12 +751,13 @@ function sortValue(p, key) {
 
 function renderTableHead() {
   const priceLabel = currentMode === 'sale' ? '売買価格帯' : '賃貸価格帯';
+  const listingsLabel = currentMode === 'sale' ? '売買募集' : '賃貸募集';
   const thead = document.getElementById('table-head');
   thead.innerHTML = '';
   const tr = document.createElement('tr');
   TABLE_COLS.forEach(c => {
     const th = document.createElement('th');
-    const label = c.key === 'price' ? priceLabel : c.label;
+    const label = c.key === 'price' ? priceLabel : c.key === 'listings' ? listingsLabel : c.label;
     if (c.sortable) {
       const arrow = currentSort.key === c.key ? (currentSort.asc ? ' ↑' : ' ↓') : '';
       const sortDir = currentSort.key === c.key ? (currentSort.asc ? 'ascending' : 'descending') : 'none';
@@ -761,10 +799,15 @@ function renderTableBody() {
   sorted.forEach(p => {
     const priceRange = currentMode === 'sale' ? p.sale : p.rent;
     const tr = document.createElement('tr');
+    const listingsCount = currentMode === 'sale' ? (p.saleListings || 0) : (p.rentListings || 0);
+    const saleNote = currentMode === 'sale' ? (p.saleNote || null) : null;
+    const badgeCls = saleNote ? 'new-sale' : (listingsCount > 0 ? 'has' : 'none');
+    const badgeText = saleNote ? escapeHtml(saleNote) : (listingsCount > 0 ? listingsCount + '件' : '0件');
     const cells = [
       { html: '<span class="td-name">' + escapeHtml(p.name) + '</span>' },
       { html: '<span class="td-area">' + escapeHtml(p.area) + '</span>' },
       { html: '<span class="td-price ' + mc + '">' + escapeHtml(formatPriceRange(priceRange, currentMode)) + '</span>' },
+      { html: '<span class="td-listings"><span class="badge ' + badgeCls + '">' + badgeText + '</span></span>' },
       { html: p.year + '年' + (p.status === 'planned' ? '<br><span style="font-size:10px;color:var(--rent)">竣工予定</span>' : ''), cls: 'td-num' },
       { html: p.floors + 'F', cls: 'td-num' },
       { html: p.units.toLocaleString() + '戸', cls: 'td-num' },
