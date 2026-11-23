@@ -424,7 +424,9 @@ const PROPERTIES = [
     rent: [25, 80], rentListings: 4,
     amenities: ['コンシェルジュ', '床暖房', 'ディスポーザー', 'スカイラウンジ', 'オートロック', '宅配ロッカー'],
     status: 'existing',
-    note: '横浜最高層の住宅（58階）・北仲通地区再開発'
+    note: '横浜最高層の住宅（58階）・北仲通地区再開発',
+    saleUrl: 'https://www.nomu.com/mansion/library/id/P0034389/',
+    rentUrl: 'https://suumo.jp/chintai/bc_100520613300/'
   },
   {
     name: 'ブランズタワー横浜北仲',
@@ -440,7 +442,9 @@ const PROPERTIES = [
     tenure: '定期借地権',
     developer: '東急不動産×京急',
     status: 'planned',
-    note: '2027年竣工予定・定期借地権・新築分譲（引渡2028年6月）'
+    note: '2027年竣工予定・定期借地権・新築分譲（引渡2028年6月）',
+    saleUrl: 'https://www.homes.co.jp/archive/c-34437/',
+    rentUrl: null
   },
   {
     name: "D'グラフォート横浜",
@@ -454,7 +458,9 @@ const PROPERTIES = [
     rent: [15, 30], rentListings: 1,
     amenities: ['免震構造', 'コンシェルジュ', 'スカイラウンジ', '指紋認証', '24時間有人管理'],
     status: 'existing',
-    note: '指紋照合セキュリティ採用'
+    note: '指紋照合セキュリティ採用',
+    saleUrl: 'https://www.nomu.com/mansion/library/id/P0000913/',
+    rentUrl: 'https://www.livable.co.jp/mansion/library/000000081969/'
   },
   {
     name: 'MM ミッドスクエア ザ・タワーレジデンス',
@@ -468,7 +474,9 @@ const PROPERTIES = [
     rent: [20, 55], rentListings: 2,
     amenities: ['コンシェルジュ', '24時間セキュリティ', 'オートロック', '宅配ボックス', '24時間有人管理'],
     status: 'existing',
-    note: 'みなとみらい駅直結'
+    note: 'みなとみらい駅直結',
+    saleUrl: 'https://www.nomu.com/mansion/library/id/P0000875/',
+    rentUrl: 'https://www.rehouse.co.jp/mansionlibrary/ABM0001246/'
   },
   {
     name: 'M.M.TOWERS The South',
@@ -482,7 +490,9 @@ const PROPERTIES = [
     rent: [18, 40], rentListings: 1,
     amenities: ['免震構造', '24時間有人管理', '全熱交換式24時間換気', 'コアウォール構造'],
     status: 'existing',
-    note: 'MM初期タワマン3棟のひとつ'
+    note: 'MM初期タワマン3棟のひとつ',
+    saleUrl: 'https://www.rehouse.co.jp/mansionlibrary/ABM0110070/',
+    rentUrl: 'https://www.rehouse.co.jp/mansionlibrary/ABM0110070/'
   },
   {
     name: 'M.M.TOWERS FORESIS',
@@ -496,7 +506,9 @@ const PROPERTIES = [
     rent: [20, 45], rentListings: 2,
     amenities: ['免震構造', 'スカイラウンジ', 'ゲストルーム', 'コンシェルジュ', '24時間有人管理', 'フロントサービス'],
     status: 'existing',
-    note: '全1,226戸の大規模レジデンス'
+    note: '全1,226戸の大規模レジデンス',
+    saleUrl: 'https://www.rehouse.co.jp/mansionlibrary/ABM0110068/',
+    rentUrl: 'https://www.rehouse.co.jp/mansionlibrary/ABM0110068/'
   },
   {
     name: 'ブリリアグランデみなとみらい',
@@ -510,7 +522,9 @@ const PROPERTIES = [
     rent: [18, 45], rentListings: 0,
     amenities: ['制震構造', 'コンシェルジュ', 'ゲストルーム', '床暖房', 'ディスポーザー', 'パーティーラウンジ'],
     status: 'existing',
-    note: '臨港パーク至近'
+    note: '臨港パーク至近',
+    saleUrl: 'https://www.nomu.com/mansion/library/id/P0000876/',
+    rentUrl: null
   },
   {
     name: 'ブランズタワーみなとみらい',
@@ -524,7 +538,9 @@ const PROPERTIES = [
     rent: [22, 55], rentListings: 1,
     amenities: ['免震構造', 'コンシェルジュ', '24時間有人管理', 'オートロック'],
     status: 'existing',
-    note: 'クイーンズスクエア隣接'
+    note: 'クイーンズスクエア隣接',
+    saleUrl: 'https://www.nomu.com/mansion/library/id/P0027932/',
+    rentUrl: 'https://suumo.jp/chintai/bc_100503719677/'
   }
 ];
 
@@ -562,9 +578,12 @@ function markerColor() {
   return currentMode === 'sale' ? '#c0503a' : '#2a8a6f';
 }
 
-function listingsBadge(count, saleNote) {
-  if (saleNote) return '<span class="popup-listings new-sale">' + escapeHtml(saleNote) + '</span>';
-  if (count > 0) return '<span class="popup-listings has">' + count + '件募集中</span>';
+function listingsBadge(count, saleNote, url) {
+  const wrap = (cls, text) => url
+    ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="popup-listings ' + cls + '" style="text-decoration:none">' + text + ' ↗</a>'
+    : '<span class="popup-listings ' + cls + '">' + text + '</span>';
+  if (saleNote) return wrap('new-sale', escapeHtml(saleNote));
+  if (count > 0) return wrap('has', count + '件募集中');
   return '<span class="popup-listings none">現在募集なし</span>';
 }
 
@@ -575,8 +594,12 @@ function popupHTML(p) {
   const listingsCount = currentMode === 'sale' ? (p.saleListings || 0) : (p.rentListings || 0);
   const saleNote = currentMode === 'sale' ? (p.saleNote || null) : null;
   const dn = escapeHtml(p.name);
+  const linkUrl = currentMode === 'sale' ? p.saleUrl : (p.rentUrl || p.saleUrl);
+  const nameHtml = linkUrl
+    ? '<a href="' + escapeHtml(linkUrl) + '" target="_blank" rel="noopener" style="color:var(--fg);text-decoration:underline;text-underline-offset:3px">' + dn + ' ↗</a>'
+    : dn;
   return '<div class="popup-card">' +
-    '<div class="popup-name">' + dn + '</div>' +
+    '<div class="popup-name">' + nameHtml + '</div>' +
     '<div class="popup-note">' + escapeHtml(p.note) + '</div>' +
     '<div class="popup-meta"><span>' + escapeHtml(p.address) + '</span></div>' +
     '<div class="popup-meta"><span>' + escapeHtml(p.station) + ' 徒歩' + p.walkMin + '分</span></div>' +
@@ -589,7 +612,7 @@ function popupHTML(p) {
       '<div class="popup-price-label ' + mc + '">' + ml + '</div>' +
       '<div class="popup-price ' + mc + '">' + escapeHtml(formatPriceRange(priceRange, currentMode)) + '</div>' +
       '<div class="popup-price-sub">' + (p.sqm ? p.sqm[0] + '〜' + p.sqm[1] + '㎡' : '') + '</div>' +
-      '<div style="margin-top:6px">' + listingsBadge(listingsCount, saleNote) + '</div>' +
+      '<div style="margin-top:6px">' + listingsBadge(listingsCount, saleNote, linkUrl) + '</div>' +
     '</div>' +
     '<div class="popup-tags">' + p.amenities.map(a => '<span class="popup-tag">' + escapeHtml(a) + '</span>').join('') + '</div>' +
   '</div>';
@@ -803,8 +826,12 @@ function renderTableBody() {
     const saleNote = currentMode === 'sale' ? (p.saleNote || null) : null;
     const badgeCls = saleNote ? 'new-sale' : (listingsCount > 0 ? 'has' : 'none');
     const badgeText = saleNote ? escapeHtml(saleNote) : (listingsCount > 0 ? listingsCount + '件' : '0件');
+    const tableUrl = currentMode === 'sale' ? p.saleUrl : (p.rentUrl || p.saleUrl);
+    const nameCell = tableUrl
+      ? '<a href="' + escapeHtml(tableUrl) + '" target="_blank" rel="noopener" class="td-name" style="color:var(--fg);text-decoration:underline;text-underline-offset:3px">' + escapeHtml(p.name) + ' ↗</a>'
+      : '<span class="td-name">' + escapeHtml(p.name) + '</span>';
     const cells = [
-      { html: '<span class="td-name">' + escapeHtml(p.name) + '</span>' },
+      { html: nameCell },
       { html: '<span class="td-area">' + escapeHtml(p.area) + '</span>' },
       { html: '<span class="td-price ' + mc + '">' + escapeHtml(formatPriceRange(priceRange, currentMode)) + '</span>' },
       { html: '<span class="td-listings"><span class="badge ' + badgeCls + '">' + badgeText + '</span></span>' },
